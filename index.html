@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Labyrinthe - Murs fins</title>
+    <title>Labyrinthe - Algorithme de Dijkstra</title>
     <style>
-        /* Conteneur du labyrinthe */
+        /* Style similaire à l'exemple précédent */
         #maze {
             display: grid;
             grid-template-columns: repeat(20, 30px);
@@ -18,7 +18,6 @@
             padding: 10px;
         }
 
-        /* Style des cellules du labyrinthe */
         .cell {
             width: 30px;
             height: 30px;
@@ -31,38 +30,32 @@
             transition: transform 0.2s ease-in-out;
         }
 
-        /* Murs noirs avec un effet d'ombre */
         .wall {
             background-color: #1e1e1e;
             box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
         }
 
-        /* Chemin stylé */
         .path {
-            background-color: #81c784; /* Couleur verte pour le chemin */
+            background-color: #81c784;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        /* Point de départ */
         .start {
             background-color: #64b5f6;
             color: white;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        /* Point d'arrivée */
         .end {
             background-color: #ef5350;
             color: white;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        /* Effet lorsque la souris passe sur une cellule */
         .cell:hover {
             transform: scale(1.1);
         }
 
-        /* Animation pour le chemin trouvé */
         .path {
             animation: highlight 1s ease-in-out;
         }
@@ -76,7 +69,6 @@
             }
         }
 
-        /* Style général de la page */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f7f7f7;
@@ -94,7 +86,7 @@
 </head>
 <body>
 
-<h1>Labyrinthe - Murs fins</h1>
+<h1>Labyrinthe - Algorithme de Dijkstra</h1>
 <div id="maze"></div>
 
 <script>
@@ -103,18 +95,18 @@
         [0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0],
         [0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0],
         [0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0],
-        [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0],
+        [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0],
         [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0],
         [0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0],
         [0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0],
         [0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0],
-        [0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1],
         [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0],
-        [0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+        [0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0]
     ];
 
     const rows = maze.length;
@@ -134,18 +126,17 @@
         return x >= 0 && y >= 0 && x < rows && y < cols && maze[x][y] === 0;
     }
 
-    // Algorithme de recherche en largeur (BFS)
-    function bfs(start, end) {
-        const queue = [start];
-        const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+    // Algorithme de Dijkstra
+    function dijkstra(start, end) {
+        const distances = Array.from({ length: rows }, () => Array(cols).fill(Infinity));
+        const priorityQueue = [[0, start]];  // [distance, [x, y]]
         const parent = Array.from({ length: rows }, () => Array(cols).fill(null));
+        distances[start[0]][start[1]] = 0;
 
-        visited[start[0]][start[1]] = true;
+        while (priorityQueue.length > 0) {
+            priorityQueue.sort((a, b) => a[0] - b[0]);  // Trier pour obtenir le plus petit coût en premier
+            const [currentDistance, [x, y]] = priorityQueue.shift();
 
-        while (queue.length > 0) {
-            const [x, y] = queue.shift();
-
-            // Si on arrive à la fin, on retourne le chemin
             if (x === end[0] && y === end[1]) {
                 return reconstructPath(parent, start, end);
             }
@@ -155,13 +146,18 @@
                 const newX = x + dx;
                 const newY = y + dy;
 
-                if (isValid(newX, newY) && !visited[newX][newY]) {
-                    visited[newX][newY] = true;
-                    parent[newX][newY] = [x, y];  // Garder trace du parent
-                    queue.push([newX, newY]);
+                if (isValid(newX, newY)) {
+                    const newDistance = currentDistance + 1;  // Coût de déplacement de 1
+
+                    if (newDistance < distances[newX][newY]) {
+                        distances[newX][newY] = newDistance;
+                        parent[newX][newY] = [x, y];
+                        priorityQueue.push([newDistance, [newX, newY]]);
+                    }
                 }
             }
         }
+
         return null;  // Pas de chemin trouvé
     }
 
@@ -207,8 +203,8 @@
         }
     }
 
-    // Trouver le chemin de A à B
-    const path = bfs(start, end);
+    // Trouver le chemin de A à B avec Dijkstra
+    const path = dijkstra(start, end);
     drawMaze(path);
 
     // Afficher le chemin dans la console
